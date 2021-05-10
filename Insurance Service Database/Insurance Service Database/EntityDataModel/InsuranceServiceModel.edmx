@@ -1,0 +1,276 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="InsuranceServiceDatabaseModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="InsuranceCompanies">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="Abbreviation" Type="nvarchar" MaxLength="5" Nullable="false" />
+        </EntityType>
+        <EntityType Name="InsuranceContracts">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" />
+          <Property Name="MedicalServiceProvider" Type="int" Nullable="false" />
+          <Property Name="InsuranceCompany" Type="int" Nullable="false" />
+          <Property Name="Type" Type="nvarchar" MaxLength="4" Nullable="false" />
+          <Property Name="ValidFrom" Type="date" Nullable="false" />
+          <Property Name="ValidUntil" Type="date" />
+        </EntityType>
+        <EntityType Name="InsuranceContractTypes">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" />
+          <Property Name="Type" Type="nvarchar" MaxLength="4" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="ValidFrom" Type="date" Nullable="false" />
+          <Property Name="ValidUntil" Type="date" />
+        </EntityType>
+        <EntityType Name="MedicalServiceProviders">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="Type" Type="nvarchar" MaxLength="2" Nullable="false" />
+        </EntityType>
+        <EntityType Name="MedicalServiceProviderTypes">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" />
+          <Property Name="Type" Type="nvarchar" MaxLength="2" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="ValidFrom" Type="date" Nullable="false" />
+          <Property Name="ValidUntil" Type="date" />
+        </EntityType>
+        <Association Name="FK_InsuranceContracts_InsuranceCompany">
+          <End Role="InsuranceCompanies" Type="Self.InsuranceCompanies" Multiplicity="1" />
+          <End Role="InsuranceContracts" Type="Self.InsuranceContracts" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="InsuranceCompanies">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="InsuranceContracts">
+              <PropertyRef Name="InsuranceCompany" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_InsuranceContracts_MedicalServiceProvider">
+          <End Role="MedicalServiceProviders" Type="Self.MedicalServiceProviders" Multiplicity="1" />
+          <End Role="InsuranceContracts" Type="Self.InsuranceContracts" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MedicalServiceProviders">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="InsuranceContracts">
+              <PropertyRef Name="MedicalServiceProvider" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <!--Errors Found During Generation:
+warning 6035: The relationship 'FK_InsuranceContracts_Type' has columns that are not part of the key of the table on the primary side of the relationship. The relationship was excluded.
+        <Association Name="FK_InsuranceContracts_Type" />-->
+        <!--Errors Found During Generation:
+warning 6035: The relationship 'FK_MedicalServiceProviders_Type' has columns that are not part of the key of the table on the primary side of the relationship. The relationship was excluded.
+        <Association Name="FK_MedicalServiceProviders_Type" />-->
+        <EntityContainer Name="InsuranceServiceDatabaseModelStoreContainer">
+          <EntitySet Name="InsuranceCompanies" EntityType="Self.InsuranceCompanies" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="InsuranceContracts" EntityType="Self.InsuranceContracts" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="InsuranceContractTypes" EntityType="Self.InsuranceContractTypes" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="MedicalServiceProviders" EntityType="Self.MedicalServiceProviders" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="MedicalServiceProviderTypes" EntityType="Self.MedicalServiceProviderTypes" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_InsuranceContracts_InsuranceCompany" Association="Self.FK_InsuranceContracts_InsuranceCompany">
+            <End Role="InsuranceCompanies" EntitySet="InsuranceCompanies" />
+            <End Role="InsuranceContracts" EntitySet="InsuranceContracts" />
+          </AssociationSet>
+          <AssociationSet Name="FK_InsuranceContracts_MedicalServiceProvider" Association="Self.FK_InsuranceContracts_MedicalServiceProvider">
+            <End Role="MedicalServiceProviders" EntitySet="MedicalServiceProviders" />
+            <End Role="InsuranceContracts" EntitySet="InsuranceContracts" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="InsuranceServiceDatabaseModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="InsuranceCompany">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" />
+          <Property Name="Name" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Abbreviation" Type="String" MaxLength="5" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="InsuranceContracts" Relationship="Self.FK_InsuranceContracts_InsuranceCompany" FromRole="InsuranceCompanies" ToRole="InsuranceContracts" />
+        </EntityType>
+        <EntityType Name="InsuranceContract">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" />
+          <Property Name="MedicalServiceProvider" Type="Int32" Nullable="false" />
+          <Property Name="InsuranceCompany" Type="Int32" Nullable="false" />
+          <Property Name="Type" Type="String" MaxLength="4" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="ValidFrom" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="ValidUntil" Type="DateTime" Precision="0" />
+          <NavigationProperty Name="InsuranceCompany1" Relationship="Self.FK_InsuranceContracts_InsuranceCompany" FromRole="InsuranceContracts" ToRole="InsuranceCompanies" />
+          <NavigationProperty Name="MedicalServiceProvider1" Relationship="Self.FK_InsuranceContracts_MedicalServiceProvider" FromRole="InsuranceContracts" ToRole="MedicalServiceProviders" />
+        </EntityType>
+        <EntityType Name="InsuranceContractType">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" />
+          <Property Name="Type" Type="String" MaxLength="4" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Name" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="ValidFrom" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="ValidUntil" Type="DateTime" Precision="0" />
+        </EntityType>
+        <EntityType Name="MedicalServiceProvider">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" />
+          <Property Name="Name" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Type" Type="String" MaxLength="2" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="InsuranceContracts" Relationship="Self.FK_InsuranceContracts_MedicalServiceProvider" FromRole="MedicalServiceProviders" ToRole="InsuranceContracts" />
+        </EntityType>
+        <EntityType Name="MedicalServiceProviderType">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" />
+          <Property Name="Type" Type="String" MaxLength="2" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Name" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="ValidFrom" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="ValidUntil" Type="DateTime" Precision="0" />
+        </EntityType>
+        <Association Name="FK_InsuranceContracts_InsuranceCompany">
+          <End Role="InsuranceCompanies" Type="Self.InsuranceCompany" Multiplicity="1" />
+          <End Role="InsuranceContracts" Type="Self.InsuranceContract" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="InsuranceCompanies">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="InsuranceContracts">
+              <PropertyRef Name="InsuranceCompany" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_InsuranceContracts_MedicalServiceProvider">
+          <End Role="MedicalServiceProviders" Type="Self.MedicalServiceProvider" Multiplicity="1" />
+          <End Role="InsuranceContracts" Type="Self.InsuranceContract" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MedicalServiceProviders">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="InsuranceContracts">
+              <PropertyRef Name="MedicalServiceProvider" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="InsuranceServiceDatabaseEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="InsuranceCompanies" EntityType="Self.InsuranceCompany" />
+          <EntitySet Name="InsuranceContracts" EntityType="Self.InsuranceContract" />
+          <EntitySet Name="InsuranceContractTypes" EntityType="Self.InsuranceContractType" />
+          <EntitySet Name="MedicalServiceProviders" EntityType="Self.MedicalServiceProvider" />
+          <EntitySet Name="MedicalServiceProviderTypes" EntityType="Self.MedicalServiceProviderType" />
+          <AssociationSet Name="FK_InsuranceContracts_InsuranceCompany" Association="Self.FK_InsuranceContracts_InsuranceCompany">
+            <End Role="InsuranceCompanies" EntitySet="InsuranceCompanies" />
+            <End Role="InsuranceContracts" EntitySet="InsuranceContracts" />
+          </AssociationSet>
+          <AssociationSet Name="FK_InsuranceContracts_MedicalServiceProvider" Association="Self.FK_InsuranceContracts_MedicalServiceProvider">
+            <End Role="MedicalServiceProviders" EntitySet="MedicalServiceProviders" />
+            <End Role="InsuranceContracts" EntitySet="InsuranceContracts" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="InsuranceServiceDatabaseModelStoreContainer" CdmEntityContainer="InsuranceServiceDatabaseEntities">
+          <EntitySetMapping Name="InsuranceCompanies">
+            <EntityTypeMapping TypeName="InsuranceServiceDatabaseModel.InsuranceCompany">
+              <MappingFragment StoreEntitySet="InsuranceCompanies">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Abbreviation" ColumnName="Abbreviation" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="InsuranceContracts">
+            <EntityTypeMapping TypeName="InsuranceServiceDatabaseModel.InsuranceContract">
+              <MappingFragment StoreEntitySet="InsuranceContracts">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="MedicalServiceProvider" ColumnName="MedicalServiceProvider" />
+                <ScalarProperty Name="InsuranceCompany" ColumnName="InsuranceCompany" />
+                <ScalarProperty Name="Type" ColumnName="Type" />
+                <ScalarProperty Name="ValidFrom" ColumnName="ValidFrom" />
+                <ScalarProperty Name="ValidUntil" ColumnName="ValidUntil" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="InsuranceContractTypes">
+            <EntityTypeMapping TypeName="InsuranceServiceDatabaseModel.InsuranceContractType">
+              <MappingFragment StoreEntitySet="InsuranceContractTypes">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Type" ColumnName="Type" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="ValidFrom" ColumnName="ValidFrom" />
+                <ScalarProperty Name="ValidUntil" ColumnName="ValidUntil" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="MedicalServiceProviders">
+            <EntityTypeMapping TypeName="InsuranceServiceDatabaseModel.MedicalServiceProvider">
+              <MappingFragment StoreEntitySet="MedicalServiceProviders">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Type" ColumnName="Type" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="MedicalServiceProviderTypes">
+            <EntityTypeMapping TypeName="InsuranceServiceDatabaseModel.MedicalServiceProviderType">
+              <MappingFragment StoreEntitySet="MedicalServiceProviderTypes">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Type" ColumnName="Type" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="ValidFrom" ColumnName="ValidFrom" />
+                <ScalarProperty Name="ValidUntil" ColumnName="ValidUntil" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
