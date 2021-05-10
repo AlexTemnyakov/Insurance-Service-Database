@@ -20,7 +20,8 @@ namespace Insurance_Service_Database.EntityDataModel
         {
             this.InsuranceContracts = new HashSet<InsuranceContract>();
         }
-    
+
+        [XmlIgnore]
         public int Id { get; set; }
         public string Name { get; set; }
         public string Abbreviation { get; set; }

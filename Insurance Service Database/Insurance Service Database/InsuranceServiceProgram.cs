@@ -11,45 +11,89 @@ using System.Xml;
 using System.Xml.Serialization;
 
 namespace Insurance_Service_Database
-{
-    public class EntityCollectionWrapper<T>
-    {
-        public List<T> EntityList { get; set; }
-    }
-
+{   
     class InsuranceServiceProgram
     {
+        private static readonly string commandToExit = "e";
+        private static readonly string commandToPrintHelp = "h";
+        private static readonly string commandToPrint = "p";
+        private static readonly string commandToSave = "s";
+        private static readonly string commandToFind = "f";
+        private static readonly string commandToFindById = "i";
+        private static readonly string insuranceCompanyCommandCode = "1";
+        private static readonly string commandToPrintAllInsuranceCompanies = commandToPrint + insuranceCompanyCommandCode;
+        private static readonly string commandToSaveAllInsuranceCompanies = commandToSave + insuranceCompanyCommandCode;
+        private static readonly string commandToFindInsuranceCompanyById = commandToFind + insuranceCompanyCommandCode + commandToFindById;
+
         private InsuranceServiceDatabaseEntities database;
 
         static void Main(string[] args)
         {          
             InsuranceServiceProgram insuranceServiceProgram = new InsuranceServiceProgram();
 
+            insuranceServiceProgram.Run();
+
             //insuranceServiceProgram.RemoveAll();
-            insuranceServiceProgram.PrintDatabaseContent();
+            //insuranceServiceProgram.PrintDatabaseContent();
 
-            //insuranceServiceProgram.AddInsuranceCompanies();
-            //insuranceServiceProgram.AddMedicalServiceProviderTypes();
-            //insuranceServiceProgram.AddInsuranceContractTypes();
-            //insuranceServiceProgram.AddMedicalServiceProviders();
-            //insuranceServiceProgram.AddInsuranceContracts();
+            ////insuranceServiceProgram.AddInsuranceCompanies();
+            ////insuranceServiceProgram.AddMedicalServiceProviderTypes();
+            ////insuranceServiceProgram.AddInsuranceContractTypes();
+            ////insuranceServiceProgram.AddMedicalServiceProviders();
+            ////insuranceServiceProgram.AddInsuranceContracts();
 
-            insuranceServiceProgram.SaveAllToXml();
+            //insuranceServiceProgram.SaveAllToXml();
 
-            foreach (var o in insuranceServiceProgram.ReadEntities<InsuranceCompany>("insurance_companies.xml"))
+            ////foreach (var o in insuranceServiceProgram.ReadEntities<InsuranceCompany>("insurance_companies.xml"))
+            ////{
+            ////    Console.WriteLine(EntityToStringConverter.InsuranceCompanyToString(o));
+            ////}
+
+
+        }
+
+        public void Run()
+        {
+            PrintHelp();
+
+            string input;
+            while ((input = Console.ReadLine()) != commandToExit)
             {
-                Console.WriteLine(EntityToStringConverter.InsuranceCompanyToString(o));
+                if (input.StartsWith(commandToFindInsuranceCompanyById))
+                {
+                    int id = int.Parse(input.Remove(0, commandToFindInsuranceCompanyById.Length + 1));
+                    Console.WriteLine(EntityToStringConverter.InsuranceCompanyToString(FindInsuranceCompanyById(id)));
+                }
+                else if (input.StartsWith(commandToSaveAllInsuranceCompanies))
+                {
+                    string path = input.Remove(0, commandToSaveAllInsuranceCompanies.Length + 1);
+                    SaveInsuranceCompaniesToXml(path);
+                }
+                else if (input == commandToExit)
+                {
+                    break;
+                }
+                else if (input == commandToPrintHelp)
+                {
+                    PrintHelp();
+                }
+                else if (input == commandToPrint)
+                {
+                    PrintDatabaseContent();
+                }                
+                else if (input == commandToPrintAllInsuranceCompanies)
+                {
+                    PrintInsuranceCompanies();
+                }
+                else
+                {
+                    Console.WriteLine("Unknown command.");
+                }
             }
-
-
-            Console.WriteLine("Press a random button to continue.");
-            Console.ReadKey();
-            insuranceServiceProgram.PrintDatabaseContent();
-            Console.ReadKey();
-            Console.WriteLine("Press a random button to exit.");
         }
 
 
+        // -----------------------------------------------------------------------------------------------------------------------1
         private EntityCollectionWrapper<T> DeserializeObject<T>(string path)
         {
             XmlSerializer serializer =
@@ -71,6 +115,10 @@ namespace Insurance_Service_Database
 
             return entityCollectionWrapper.EntityList;
         }
+        // -----------------------------------------------------------------------------------------------------------------------
+
+
+
 
         // -----------------------------------------------------------------------------------------------------------------------
         public void SaveAllToXml()
@@ -80,6 +128,11 @@ namespace Insurance_Service_Database
             SaveMedicalServiceProvidersToXml("medical_service_providers.xml");
             SaveInsuranceContractTypesToXml("insurance_contract_types.xml");
             SaveInsuranceContractsToXml("insurance_contracts.xml");
+        }
+
+        public void SaveEntitiesToXml<T>(IEnumerable<T> collectionOfEntities, string path)
+        {
+            SaveString(EntitiesToXml<T>(collectionOfEntities), path);
         }
 
         public void SaveInsuranceCompaniesToXml(string path)
@@ -282,6 +335,31 @@ namespace Insurance_Service_Database
 
 
         // -----------------------------------------------------------------------------------------------------------------------   
+        public void PrintHelp()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.AppendFormat(
+                @"{0}        - exit{1}",
+                commandToExit, Environment.NewLine);
+            sb.AppendFormat(
+                @"{0}        - print help{1}",
+                commandToPrintHelp, Environment.NewLine);
+            sb.AppendFormat(
+                @"{0}        - print database content{1}",
+                commandToPrint, Environment.NewLine);
+            sb.AppendFormat(
+                @"{0}       - print insurance companies{1}",
+                commandToPrintAllInsuranceCompanies, Environment.NewLine);
+            sb.AppendFormat(
+                @"{0} PATH  - save insurance companies{1}",
+                commandToSaveAllInsuranceCompanies, Environment.NewLine);
+            sb.AppendFormat(
+                @"{0} ID   - find insurance company by ID{1}",
+                commandToFindInsuranceCompanyById, Environment.NewLine);
+
+            Console.WriteLine(sb.ToString());
+        }
+
         public void PrintDatabaseContent()
         {
             PrintInsuranceCompanies();
@@ -709,5 +787,10 @@ namespace Insurance_Service_Database
                 return database;
             }
         }
+    }
+
+    public class EntityCollectionWrapper<T>
+    {
+        public List<T> EntityList { get; set; }
     }
 }

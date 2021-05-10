@@ -15,6 +15,7 @@ namespace Insurance_Service_Database.EntityDataModel
 
     public partial class InsuranceContract
     {
+        [XmlIgnore]
         public int Id { get; set; }
         public int MedicalServiceProviderId { get; set; }
         public int InsuranceCompanyId { get; set; }
