@@ -14,10 +14,19 @@ namespace Insurance_Service_Database.EntityDataModel
     
     public partial class InsuranceContractType
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+        public InsuranceContractType()
+        {
+            this.InsuranceContracts = new HashSet<InsuranceContract>();
+        }
+    
         public int Id { get; set; }
-        public string Type { get; set; }
+        public string Code { get; set; }
         public string Name { get; set; }
         public System.DateTime ValidFrom { get; set; }
         public Nullable<System.DateTime> ValidUntil { get; set; }
+    
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<InsuranceContract> InsuranceContracts { get; set; }
     }
 }

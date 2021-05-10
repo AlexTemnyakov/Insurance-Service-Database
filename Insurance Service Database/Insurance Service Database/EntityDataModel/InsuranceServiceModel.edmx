@@ -9,7 +9,7 @@
           <Key>
             <PropertyRef Name="Id" />
           </Key>
-          <Property Name="Id" Type="int" Nullable="false" />
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="Name" Type="nvarchar" MaxLength="100" Nullable="false" />
           <Property Name="Abbreviation" Type="nvarchar" MaxLength="5" Nullable="false" />
         </EntityType>
@@ -17,10 +17,10 @@
           <Key>
             <PropertyRef Name="Id" />
           </Key>
-          <Property Name="Id" Type="int" Nullable="false" />
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="MedicalServiceProvider" Type="int" Nullable="false" />
           <Property Name="InsuranceCompany" Type="int" Nullable="false" />
-          <Property Name="Type" Type="nvarchar" MaxLength="4" Nullable="false" />
+          <Property Name="Type" Type="int" Nullable="false" />
           <Property Name="ValidFrom" Type="date" Nullable="false" />
           <Property Name="ValidUntil" Type="date" />
         </EntityType>
@@ -28,8 +28,8 @@
           <Key>
             <PropertyRef Name="Id" />
           </Key>
-          <Property Name="Id" Type="int" Nullable="false" />
-          <Property Name="Type" Type="nvarchar" MaxLength="4" Nullable="false" />
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Code" Type="nvarchar" MaxLength="4" Nullable="false" />
           <Property Name="Name" Type="nvarchar" MaxLength="100" Nullable="false" />
           <Property Name="ValidFrom" Type="date" Nullable="false" />
           <Property Name="ValidUntil" Type="date" />
@@ -38,16 +38,16 @@
           <Key>
             <PropertyRef Name="Id" />
           </Key>
-          <Property Name="Id" Type="int" Nullable="false" />
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="Name" Type="nvarchar" MaxLength="100" Nullable="false" />
-          <Property Name="Type" Type="nvarchar" MaxLength="2" Nullable="false" />
+          <Property Name="Type" Type="int" Nullable="false" />
         </EntityType>
         <EntityType Name="MedicalServiceProviderTypes">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
-          <Property Name="Id" Type="int" Nullable="false" />
-          <Property Name="Type" Type="nvarchar" MaxLength="2" Nullable="false" />
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Code" Type="nvarchar" MaxLength="2" Nullable="false" />
           <Property Name="Name" Type="nvarchar" MaxLength="100" Nullable="false" />
           <Property Name="ValidFrom" Type="date" Nullable="false" />
           <Property Name="ValidUntil" Type="date" />
@@ -76,12 +76,30 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <!--Errors Found During Generation:
-warning 6035: The relationship 'FK_InsuranceContracts_Type' has columns that are not part of the key of the table on the primary side of the relationship. The relationship was excluded.
-        <Association Name="FK_InsuranceContracts_Type" />-->
-        <!--Errors Found During Generation:
-warning 6035: The relationship 'FK_MedicalServiceProviders_Type' has columns that are not part of the key of the table on the primary side of the relationship. The relationship was excluded.
-        <Association Name="FK_MedicalServiceProviders_Type" />-->
+        <Association Name="FK_InsuranceContracts_Type">
+          <End Role="InsuranceContractTypes" Type="Self.InsuranceContractTypes" Multiplicity="1" />
+          <End Role="InsuranceContracts" Type="Self.InsuranceContracts" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="InsuranceContractTypes">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="InsuranceContracts">
+              <PropertyRef Name="Type" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_MedicalServiceProviders_Type">
+          <End Role="MedicalServiceProviderTypes" Type="Self.MedicalServiceProviderTypes" Multiplicity="1" />
+          <End Role="MedicalServiceProviders" Type="Self.MedicalServiceProviders" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MedicalServiceProviderTypes">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="MedicalServiceProviders">
+              <PropertyRef Name="Type" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <EntityContainer Name="InsuranceServiceDatabaseModelStoreContainer">
           <EntitySet Name="InsuranceCompanies" EntityType="Self.InsuranceCompanies" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="InsuranceContracts" EntityType="Self.InsuranceContracts" Schema="dbo" store:Type="Tables" />
@@ -96,6 +114,14 @@ warning 6035: The relationship 'FK_MedicalServiceProviders_Type' has columns tha
             <End Role="MedicalServiceProviders" EntitySet="MedicalServiceProviders" />
             <End Role="InsuranceContracts" EntitySet="InsuranceContracts" />
           </AssociationSet>
+          <AssociationSet Name="FK_InsuranceContracts_Type" Association="Self.FK_InsuranceContracts_Type">
+            <End Role="InsuranceContractTypes" EntitySet="InsuranceContractTypes" />
+            <End Role="InsuranceContracts" EntitySet="InsuranceContracts" />
+          </AssociationSet>
+          <AssociationSet Name="FK_MedicalServiceProviders_Type" Association="Self.FK_MedicalServiceProviders_Type">
+            <End Role="MedicalServiceProviderTypes" EntitySet="MedicalServiceProviderTypes" />
+            <End Role="MedicalServiceProviders" EntitySet="MedicalServiceProviders" />
+          </AssociationSet>
         </EntityContainer>
       </Schema>
     </edmx:StorageModels>
@@ -106,7 +132,7 @@ warning 6035: The relationship 'FK_MedicalServiceProviders_Type' has columns tha
           <Key>
             <PropertyRef Name="Id" />
           </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" />
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Name" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="Abbreviation" Type="String" MaxLength="5" FixedLength="false" Unicode="true" Nullable="false" />
           <NavigationProperty Name="InsuranceContracts" Relationship="Self.FK_InsuranceContracts_InsuranceCompany" FromRole="InsuranceCompanies" ToRole="InsuranceContracts" />
@@ -115,43 +141,47 @@ warning 6035: The relationship 'FK_MedicalServiceProviders_Type' has columns tha
           <Key>
             <PropertyRef Name="Id" />
           </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" />
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="MedicalServiceProvider" Type="Int32" Nullable="false" />
           <Property Name="InsuranceCompany" Type="Int32" Nullable="false" />
-          <Property Name="Type" Type="String" MaxLength="4" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Type" Type="Int32" Nullable="false" />
           <Property Name="ValidFrom" Type="DateTime" Nullable="false" Precision="0" />
           <Property Name="ValidUntil" Type="DateTime" Precision="0" />
           <NavigationProperty Name="InsuranceCompany1" Relationship="Self.FK_InsuranceContracts_InsuranceCompany" FromRole="InsuranceContracts" ToRole="InsuranceCompanies" />
           <NavigationProperty Name="MedicalServiceProvider1" Relationship="Self.FK_InsuranceContracts_MedicalServiceProvider" FromRole="InsuranceContracts" ToRole="MedicalServiceProviders" />
+          <NavigationProperty Name="InsuranceContractType" Relationship="Self.FK_InsuranceContracts_Type" FromRole="InsuranceContracts" ToRole="InsuranceContractTypes" />
         </EntityType>
         <EntityType Name="InsuranceContractType">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" />
-          <Property Name="Type" Type="String" MaxLength="4" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Code" Type="String" MaxLength="4" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="Name" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="ValidFrom" Type="DateTime" Nullable="false" Precision="0" />
           <Property Name="ValidUntil" Type="DateTime" Precision="0" />
+          <NavigationProperty Name="InsuranceContracts" Relationship="Self.FK_InsuranceContracts_Type" FromRole="InsuranceContractTypes" ToRole="InsuranceContracts" />
         </EntityType>
         <EntityType Name="MedicalServiceProvider">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" />
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Name" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="Type" Type="String" MaxLength="2" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Type" Type="Int32" Nullable="false" />
           <NavigationProperty Name="InsuranceContracts" Relationship="Self.FK_InsuranceContracts_MedicalServiceProvider" FromRole="MedicalServiceProviders" ToRole="InsuranceContracts" />
+          <NavigationProperty Name="MedicalServiceProviderType" Relationship="Self.FK_MedicalServiceProviders_Type" FromRole="MedicalServiceProviders" ToRole="MedicalServiceProviderTypes" />
         </EntityType>
         <EntityType Name="MedicalServiceProviderType">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" />
-          <Property Name="Type" Type="String" MaxLength="2" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Code" Type="String" MaxLength="2" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="Name" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="ValidFrom" Type="DateTime" Nullable="false" Precision="0" />
           <Property Name="ValidUntil" Type="DateTime" Precision="0" />
+          <NavigationProperty Name="MedicalServiceProviders" Relationship="Self.FK_MedicalServiceProviders_Type" FromRole="MedicalServiceProviderTypes" ToRole="MedicalServiceProviders" />
         </EntityType>
         <Association Name="FK_InsuranceContracts_InsuranceCompany">
           <End Role="InsuranceCompanies" Type="Self.InsuranceCompany" Multiplicity="1" />
@@ -177,6 +207,30 @@ warning 6035: The relationship 'FK_MedicalServiceProviders_Type' has columns tha
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_InsuranceContracts_Type">
+          <End Role="InsuranceContractTypes" Type="Self.InsuranceContractType" Multiplicity="1" />
+          <End Role="InsuranceContracts" Type="Self.InsuranceContract" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="InsuranceContractTypes">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="InsuranceContracts">
+              <PropertyRef Name="Type" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_MedicalServiceProviders_Type">
+          <End Role="MedicalServiceProviderTypes" Type="Self.MedicalServiceProviderType" Multiplicity="1" />
+          <End Role="MedicalServiceProviders" Type="Self.MedicalServiceProvider" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MedicalServiceProviderTypes">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="MedicalServiceProviders">
+              <PropertyRef Name="Type" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <EntityContainer Name="InsuranceServiceDatabaseEntities" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="InsuranceCompanies" EntityType="Self.InsuranceCompany" />
           <EntitySet Name="InsuranceContracts" EntityType="Self.InsuranceContract" />
@@ -190,6 +244,14 @@ warning 6035: The relationship 'FK_MedicalServiceProviders_Type' has columns tha
           <AssociationSet Name="FK_InsuranceContracts_MedicalServiceProvider" Association="Self.FK_InsuranceContracts_MedicalServiceProvider">
             <End Role="MedicalServiceProviders" EntitySet="MedicalServiceProviders" />
             <End Role="InsuranceContracts" EntitySet="InsuranceContracts" />
+          </AssociationSet>
+          <AssociationSet Name="FK_InsuranceContracts_Type" Association="Self.FK_InsuranceContracts_Type">
+            <End Role="InsuranceContractTypes" EntitySet="InsuranceContractTypes" />
+            <End Role="InsuranceContracts" EntitySet="InsuranceContracts" />
+          </AssociationSet>
+          <AssociationSet Name="FK_MedicalServiceProviders_Type" Association="Self.FK_MedicalServiceProviders_Type">
+            <End Role="MedicalServiceProviderTypes" EntitySet="MedicalServiceProviderTypes" />
+            <End Role="MedicalServiceProviders" EntitySet="MedicalServiceProviders" />
           </AssociationSet>
         </EntityContainer>
       </Schema>
@@ -223,7 +285,7 @@ warning 6035: The relationship 'FK_MedicalServiceProviders_Type' has columns tha
             <EntityTypeMapping TypeName="InsuranceServiceDatabaseModel.InsuranceContractType">
               <MappingFragment StoreEntitySet="InsuranceContractTypes">
                 <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="Type" ColumnName="Type" />
+                <ScalarProperty Name="Code" ColumnName="Code" />
                 <ScalarProperty Name="Name" ColumnName="Name" />
                 <ScalarProperty Name="ValidFrom" ColumnName="ValidFrom" />
                 <ScalarProperty Name="ValidUntil" ColumnName="ValidUntil" />
@@ -243,7 +305,7 @@ warning 6035: The relationship 'FK_MedicalServiceProviders_Type' has columns tha
             <EntityTypeMapping TypeName="InsuranceServiceDatabaseModel.MedicalServiceProviderType">
               <MappingFragment StoreEntitySet="MedicalServiceProviderTypes">
                 <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="Type" ColumnName="Type" />
+                <ScalarProperty Name="Code" ColumnName="Code" />
                 <ScalarProperty Name="Name" ColumnName="Name" />
                 <ScalarProperty Name="ValidFrom" ColumnName="ValidFrom" />
                 <ScalarProperty Name="ValidUntil" ColumnName="ValidUntil" />

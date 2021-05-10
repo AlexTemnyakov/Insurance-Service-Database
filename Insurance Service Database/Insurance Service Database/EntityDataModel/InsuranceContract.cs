@@ -17,11 +17,12 @@ namespace Insurance_Service_Database.EntityDataModel
         public int Id { get; set; }
         public int MedicalServiceProvider { get; set; }
         public int InsuranceCompany { get; set; }
-        public string Type { get; set; }
+        public int Type { get; set; }
         public System.DateTime ValidFrom { get; set; }
         public Nullable<System.DateTime> ValidUntil { get; set; }
     
         public virtual InsuranceCompany InsuranceCompany1 { get; set; }
         public virtual MedicalServiceProvider MedicalServiceProvider1 { get; set; }
+        public virtual InsuranceContractType InsuranceContractType { get; set; }
     }
 }

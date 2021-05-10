@@ -59,6 +59,7 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security" />
+    <Reference Include="System.Transactions" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -97,6 +98,7 @@
     <Compile Include="EntityDataModel\MedicalServiceProviderType.cs">
       <DependentUpon>InsuranceServiceModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="EntityToStringConverter.cs" />
     <Compile Include="InsuranceServiceProgram.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
