@@ -477,11 +477,91 @@ namespace Insurance_Service_Database
             {
                 AddInsuranceContract(new InsuranceContract()
                 {
-                    MedicalServiceProvider = FindMedicalServiceProviderById(1).Id,
-                    InsuranceCompany = FindInsuranceCompanyById(1).Id,
-                    Type = (new List<InsuranceContractType>(FindInsuranceContractTypesByCode("A001")))[0].Id,
+                    MedicalServiceProviderId = FindMedicalServiceProviderById(1).Id,
+                    InsuranceCompanyId = FindInsuranceCompanyById(1).Id,
+                    TypeId = (new List<InsuranceContractType>(FindInsuranceContractTypesByCode("A001")))[0].Id,
                     ValidFrom = new DateTime(2010, 5, 6),
                     ValidUntil = new DateTime(2010, 10, 11)
+                });
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+            try
+            {
+                AddInsuranceContract(new InsuranceContract()
+                {
+                    MedicalServiceProviderId = FindMedicalServiceProviderById(1).Id,
+                    InsuranceCompanyId = FindInsuranceCompanyById(1).Id,
+                    TypeId = (new List<InsuranceContractType>(FindInsuranceContractTypesByCode("A001")))[0].Id,
+                    ValidFrom = new DateTime(2013, 5, 6),
+                    ValidUntil = new DateTime(2010, 10, 11)
+                });
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+            try
+            {
+                AddInsuranceContract(new InsuranceContract()
+                {
+                    MedicalServiceProviderId = FindMedicalServiceProviderById(1).Id,
+                    InsuranceCompanyId = FindInsuranceCompanyById(1).Id,
+                    TypeId = (new List<InsuranceContractType>(FindInsuranceContractTypesByCode("A001")))[0].Id,
+                    ValidFrom = new DateTime(2016, 5, 6),
+                    ValidUntil = null
+                });
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+            try
+            {
+                AddInsuranceContract(new InsuranceContract()
+                {
+                    MedicalServiceProviderId = FindMedicalServiceProviderById(2).Id,
+                    InsuranceCompanyId = FindInsuranceCompanyById(1).Id,
+                    TypeId = (new List<InsuranceContractType>(FindInsuranceContractTypesByCode("A002")))[0].Id,
+                    ValidFrom = new DateTime(2016, 5, 6),
+                    ValidUntil = null
+                });
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+            try
+            {
+                AddInsuranceContract(new InsuranceContract()
+                {
+                    MedicalServiceProviderId = FindMedicalServiceProviderById(3).Id,
+                    InsuranceCompanyId = FindInsuranceCompanyById(1).Id,
+                    TypeId = (new List<InsuranceContractType>(FindInsuranceContractTypesByCode("A001")))[0].Id,
+                    ValidFrom = new DateTime(2010, 5, 6),
+                    ValidUntil = new DateTime(2016, 4, 6)
+                });
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+            try
+            {
+                AddInsuranceContract(new InsuranceContract()
+                {
+                    MedicalServiceProviderId = FindMedicalServiceProviderById(3).Id,
+                    InsuranceCompanyId = FindInsuranceCompanyById(1).Id,
+                    TypeId = (new List<InsuranceContractType>(FindInsuranceContractTypesByCode("A001")))[0].Id,
+                    ValidFrom = new DateTime(2016, 5, 6),
+                    ValidUntil = null
                 });
             }
             catch (Exception e)

@@ -4,15 +4,15 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="7a5494abc290400aba4986a123d65599" Name="Diagram1">
+      <Diagram DiagramId="6332b5d2a20343c3b472a23b751e31f1" Name="Diagram1">
         <EntityTypeShape EntityType="InsuranceServiceDatabaseModel.InsuranceCompany" Width="1.5" PointX="3" PointY="4.875" IsExpanded="true" />
         <EntityTypeShape EntityType="InsuranceServiceDatabaseModel.InsuranceContract" Width="1.5" PointX="5.25" PointY="1" IsExpanded="true" />
         <EntityTypeShape EntityType="InsuranceServiceDatabaseModel.InsuranceContractType" Width="1.5" PointX="3" PointY="7.375" IsExpanded="true" />
         <EntityTypeShape EntityType="InsuranceServiceDatabaseModel.MedicalServiceProvider" Width="1.5" PointX="3" PointY="1.375" IsExpanded="true" />
         <EntityTypeShape EntityType="InsuranceServiceDatabaseModel.MedicalServiceProviderType" Width="1.5" PointX="0.75" PointY="1.25" IsExpanded="true" />
-        <AssociationConnector Association="InsuranceServiceDatabaseModel.FK_InsuranceContracts_InsuranceCompany" ManuallyRouted="false" />
-        <AssociationConnector Association="InsuranceServiceDatabaseModel.FK_InsuranceContracts_MedicalServiceProvider" ManuallyRouted="false" />
-        <AssociationConnector Association="InsuranceServiceDatabaseModel.FK_InsuranceContracts_Type" ManuallyRouted="false" />
+        <AssociationConnector Association="InsuranceServiceDatabaseModel.FK_InsuranceContracts_InsuranceCompanyId" ManuallyRouted="false" />
+        <AssociationConnector Association="InsuranceServiceDatabaseModel.FK_InsuranceContracts_MedicalServiceProviderId" ManuallyRouted="false" />
+        <AssociationConnector Association="InsuranceServiceDatabaseModel.FK_InsuranceContracts_TypeId" ManuallyRouted="false" />
         <AssociationConnector Association="InsuranceServiceDatabaseModel.FK_MedicalServiceProviders_Type" ManuallyRouted="false" />
       </Diagram>
     </edmx:Diagrams>
