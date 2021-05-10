@@ -12,6 +12,11 @@ using System.Xml.Serialization;
 
 namespace Insurance_Service_Database
 {
+    public class EntityCollectionWrapper<T>
+    {
+        public List<T> EntityList { get; set; }
+    }
+
     class InsuranceServiceProgram
     {
         private InsuranceServiceDatabaseEntities database;
@@ -19,43 +24,122 @@ namespace Insurance_Service_Database
         static void Main(string[] args)
         {          
             InsuranceServiceProgram insuranceServiceProgram = new InsuranceServiceProgram();
+
+            //insuranceServiceProgram.RemoveAll();
             insuranceServiceProgram.PrintDatabaseContent();
 
-            //insuranceServiceProgram.RemoveAllInsuranceCompanies();
-            //insuranceServiceProgram.RemoveAllMedicalServiceProviderTypes();
+            //insuranceServiceProgram.AddInsuranceCompanies();
+            //insuranceServiceProgram.AddMedicalServiceProviderTypes();
+            //insuranceServiceProgram.AddInsuranceContractTypes();
+            //insuranceServiceProgram.AddMedicalServiceProviders();
+            //insuranceServiceProgram.AddInsuranceContracts();
 
-            insuranceServiceProgram.AddInsuranceCompanies();
-            insuranceServiceProgram.AddMedicalServiceProviderTypes();
-            insuranceServiceProgram.AddInsuranceContractTypes();
-            insuranceServiceProgram.AddMedicalServiceProviders();
-            insuranceServiceProgram.AddInsuranceContracts();
+            insuranceServiceProgram.SaveAllToXml();
 
-            //XmlSerializer xsSubmit = new XmlSerializer(typeof(MedicalServiceProvider));
-            //var subReq = insuranceServiceProgram.FindMedicalServiceProviderById(1);
-            //var xml = "";
+            foreach (var o in insuranceServiceProgram.ReadEntities<InsuranceCompany>("insurance_companies.xml"))
+            {
+                Console.WriteLine(EntityToStringConverter.InsuranceCompanyToString(o));
+            }
 
-            //using (var sww = new StringWriter())
-            //{
-            //    using (XmlWriter writer = XmlWriter.Create(sww))
-            //    {
-            //        xsSubmit.Serialize(writer, subReq);
-            //        xml = sww.ToString(); // Your XML
-            //    }
-            //}
 
-            //using (StreamWriter streamWriter = new StreamWriter("test.xml"))
-            //{
-            //    streamWriter.WriteLine(xml);
-            //}
-
-            //using (XmlWriter writer = XmlWriter.Create("test.xml"))
-            //{
-            //    DataContractSerializer serializer = new DataContractSerializer(subReq.GetType());
-            //    serializer.WriteObject(writer, subReq);
-            //}
-
+            Console.WriteLine("Press a random button to continue.");
             Console.ReadKey();
+            insuranceServiceProgram.PrintDatabaseContent();
+            Console.ReadKey();
+            Console.WriteLine("Press a random button to exit.");
         }
+
+
+        private EntityCollectionWrapper<T> DeserializeObject<T>(string path)
+        {
+            XmlSerializer serializer =
+            new XmlSerializer(typeof(EntityCollectionWrapper<T>));
+
+            EntityCollectionWrapper<T> i;
+
+            using (Stream reader = new FileStream(path, FileMode.Open))
+            {
+                i = serializer.Deserialize(reader) as EntityCollectionWrapper<T>;
+            }
+
+            return i;
+        }
+
+        public List<T> ReadEntities<T>(string path)
+        {
+            EntityCollectionWrapper<T> entityCollectionWrapper = DeserializeObject<T>(path);
+
+            return entityCollectionWrapper.EntityList;
+        }
+
+        // -----------------------------------------------------------------------------------------------------------------------
+        public void SaveAllToXml()
+        {
+            SaveInsuranceCompaniesToXml("insurance_companies.xml");
+            SaveMedicalServiceProviderTypesToXml("medical_service_provider_types.xml");
+            SaveMedicalServiceProvidersToXml("medical_service_providers.xml");
+            SaveInsuranceContractTypesToXml("insurance_contract_types.xml");
+            SaveInsuranceContractsToXml("insurance_contracts.xml");
+        }
+
+        public void SaveInsuranceCompaniesToXml(string path)
+        {
+            SaveString(EntitiesToXml(DatabaseContext.InsuranceCompanies), path);
+        }
+
+        public void SaveMedicalServiceProviderTypesToXml(string path)
+        {
+            SaveString(EntitiesToXml(DatabaseContext.MedicalServiceProviderTypes), path);
+        }
+
+        public void SaveMedicalServiceProvidersToXml(string path)
+        {
+            SaveString(EntitiesToXml(DatabaseContext.MedicalServiceProviders), path);
+        }
+
+        public void SaveInsuranceContractTypesToXml(string path)
+        {
+            SaveString(EntitiesToXml(DatabaseContext.InsuranceContractTypes), path);
+        }
+
+        public void SaveInsuranceContractsToXml(string path)
+        {
+            SaveString(EntitiesToXml(DatabaseContext.InsuranceContracts), path);
+        }
+
+        public static void SaveString(string stringToSave, string path)
+        {
+            using (StreamWriter streamWriter = new StreamWriter(path))
+            {
+                streamWriter.WriteLine(stringToSave);
+            }
+        }
+
+        public string EntitiesToXml<T>(IEnumerable<T> entities)
+        {
+            DatabaseContext.Configuration.ProxyCreationEnabled = false;
+
+            XmlSerializer xmlSerializer = new XmlSerializer(typeof(EntityCollectionWrapper<T>));
+
+            string xml = "";
+
+            EntityCollectionWrapper<T> collectionWrapper = new EntityCollectionWrapper<T>();
+            collectionWrapper.EntityList = new List<T>(entities);
+
+            using (var sww = new StringWriter())
+            {
+                XmlWriterSettings xmlWriterSettings = new XmlWriterSettings();
+                xmlWriterSettings.OmitXmlDeclaration = true;
+                using (XmlWriter writer = XmlWriter.Create(sww, xmlWriterSettings))
+                {
+                    xmlSerializer.Serialize(writer, collectionWrapper);
+                    xml += sww.ToString(); // Your XML
+                }
+            }
+
+            return xml;
+        }
+        // -----------------------------------------------------------------------------------------------------------------------
 
 
 
@@ -63,16 +147,28 @@ namespace Insurance_Service_Database
         // -----------------------------------------------------------------------------------------------------------------------
         private void RemoveAllInsuranceCompanies()
         {
-            foreach (var entity in Database.InsuranceCompanies)
-                Database.InsuranceCompanies.Remove(entity);
-            Database.SaveChanges();
+            foreach (var entity in DatabaseContext.InsuranceCompanies)
+                DatabaseContext.InsuranceCompanies.Remove(entity);
+            DatabaseContext.SaveChanges();
         }
 
         private void RemoveAllMedicalServiceProviderTypes()
         {
-            foreach (var entity in Database.MedicalServiceProviderTypes)
-                Database.MedicalServiceProviderTypes.Remove(entity);
-            Database.SaveChanges();
+            foreach (var entity in DatabaseContext.MedicalServiceProviderTypes)
+                DatabaseContext.MedicalServiceProviderTypes.Remove(entity);
+            DatabaseContext.SaveChanges();
+        }
+
+        private void RemoveAll()
+        {
+            var tableNames = DatabaseContext.Database.SqlQuery<string>(
+                "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME NOT LIKE '%Migration%'").ToList();
+            foreach (var tableName in tableNames)
+            {
+                DatabaseContext.Database.ExecuteSqlCommand(string.Format("DELETE FROM {0}", tableName));
+                DatabaseContext.Database.ExecuteSqlCommand(string.Format("DBCC CHECKIDENT ({0}, RESEED, 0)", tableName));
+            }
+            DatabaseContext.SaveChanges();
         }
         // -----------------------------------------------------------------------------------------------------------------------
 
@@ -82,7 +178,7 @@ namespace Insurance_Service_Database
         // -----------------------------------------------------------------------------------------------------------------------          
         public InsuranceCompany FindInsuranceCompanyById(int id)
         {
-            var query = from o in Database.InsuranceCompanies
+            var query = from o in DatabaseContext.InsuranceCompanies
                         where o.Id == id
                         select o;
             return query.FirstOrDefault();
@@ -90,7 +186,7 @@ namespace Insurance_Service_Database
 
         public MedicalServiceProviderType FindMedicalServiceProviderTypeById(int id)
         {
-            var query = from o in Database.MedicalServiceProviderTypes
+            var query = from o in DatabaseContext.MedicalServiceProviderTypes
                         where o.Id == id
                         select o;
             return query.FirstOrDefault();
@@ -98,14 +194,14 @@ namespace Insurance_Service_Database
 
         public IEnumerable<MedicalServiceProviderType> FindMedicalServiceProviderTypesByCode(string code)
         {
-            return from o in Database.MedicalServiceProviderTypes
+            return from o in DatabaseContext.MedicalServiceProviderTypes
                    where o.Code == code
                    select o;
         }
 
         public MedicalServiceProvider FindMedicalServiceProviderById(int id)
         {
-            var query = from o in Database.MedicalServiceProviders
+            var query = from o in DatabaseContext.MedicalServiceProviders
                         where o.Id == id
                         select o;
             return query.FirstOrDefault();
@@ -113,7 +209,7 @@ namespace Insurance_Service_Database
 
         public IEnumerable<InsuranceContractType> FindInsuranceContractTypesByCode(string code)
         {
-            return from o in Database.InsuranceContractTypes
+            return from o in DatabaseContext.InsuranceContractTypes
                    where o.Code == code
                    select o;
         }
@@ -125,7 +221,7 @@ namespace Insurance_Service_Database
         // -----------------------------------------------------------------------------------------------------------------------   
         public bool AddInsuranceCompany(InsuranceCompany insuranceCompany)
         {
-            Database.InsuranceCompanies.Add(insuranceCompany);
+            DatabaseContext.InsuranceCompanies.Add(insuranceCompany);
             return DoCommonStepsAfterAdditionToDatabase();
         }
 
@@ -136,31 +232,31 @@ namespace Insurance_Service_Database
             medicalServiceProviderType.Name = name;
             medicalServiceProviderType.ValidFrom = validFrom;
             medicalServiceProviderType.ValidUntil = validUntil;
-            Database.MedicalServiceProviderTypes.Add(medicalServiceProviderType);
+            DatabaseContext.MedicalServiceProviderTypes.Add(medicalServiceProviderType);
             return DoCommonStepsAfterAdditionToDatabase();
         }
 
         public bool AddMedicalServiceProviderType(MedicalServiceProviderType medicalServiceProviderType)
         {
-            Database.MedicalServiceProviderTypes.Add(medicalServiceProviderType);
+            DatabaseContext.MedicalServiceProviderTypes.Add(medicalServiceProviderType);
             return DoCommonStepsAfterAdditionToDatabase();
         }
 
         public bool AddInsuranceContractType(InsuranceContractType insuranceContractType)
         {
-            Database.InsuranceContractTypes.Add(insuranceContractType);
+            DatabaseContext.InsuranceContractTypes.Add(insuranceContractType);
             return DoCommonStepsAfterAdditionToDatabase();
         }
 
         public bool AddMedicalServiceProvider(MedicalServiceProvider medicalServiceProvider)
         {
-            Database.MedicalServiceProviders.Add(medicalServiceProvider);
+            DatabaseContext.MedicalServiceProviders.Add(medicalServiceProvider);
             return DoCommonStepsAfterAdditionToDatabase();
         }
 
         public bool AddInsuranceContract(InsuranceContract insuranceContract)
         {
-            Database.InsuranceContracts.Add(insuranceContract);
+            DatabaseContext.InsuranceContracts.Add(insuranceContract);
             return DoCommonStepsAfterAdditionToDatabase();
         }
 
@@ -168,7 +264,7 @@ namespace Insurance_Service_Database
         {
             try
             {
-                Database.SaveChanges();
+                DatabaseContext.SaveChanges();
 
                 return true;
             }
@@ -204,7 +300,7 @@ namespace Insurance_Service_Database
         {
             Console.WriteLine("========= INSURANCE COMPANIES =========");
             Console.WriteLine();
-            foreach (var o in Database.InsuranceCompanies)
+            foreach (var o in DatabaseContext.InsuranceCompanies)
             {
                 Console.WriteLine(EntityToStringConverter.InsuranceCompanyToString(o));
                 Console.WriteLine("\n");
@@ -216,7 +312,7 @@ namespace Insurance_Service_Database
         {
             Console.WriteLine("========= MEDICAL SERVICE PROVIDERS =========");
             Console.WriteLine();
-            foreach (var o in Database.MedicalServiceProviderTypes)
+            foreach (var o in DatabaseContext.MedicalServiceProviderTypes)
             {
                 Console.WriteLine(EntityToStringConverter.MedicalServiceProviderTypeToString(o));
                 Console.WriteLine("\n");
@@ -228,7 +324,7 @@ namespace Insurance_Service_Database
         {
             Console.WriteLine("========= INSURANCE CONTRACT TYPES =========");
             Console.WriteLine();
-            foreach (var o in Database.InsuranceContractTypes)
+            foreach (var o in DatabaseContext.InsuranceContractTypes)
             {
                 Console.WriteLine(EntityToStringConverter.InsuranceContractTypeToString(o));
                 Console.WriteLine("\n");
@@ -240,7 +336,7 @@ namespace Insurance_Service_Database
         {
             Console.WriteLine("========= MEDICAL SERVICE PROVIDERS =========");
             Console.WriteLine();
-            foreach (var o in Database.MedicalServiceProviders)
+            foreach (var o in DatabaseContext.MedicalServiceProviders)
             {
                 Console.WriteLine(EntityToStringConverter.MedicalServiceProviderToString(o));
                 Console.WriteLine("\n");
@@ -252,7 +348,7 @@ namespace Insurance_Service_Database
         {
             Console.WriteLine("========= INSURANCE CONTRACTS =========");
             Console.WriteLine();
-            foreach (var o in Database.InsuranceContracts)
+            foreach (var o in DatabaseContext.InsuranceContracts)
             {
                 Console.WriteLine(o);
                 Console.WriteLine("\n");
@@ -603,12 +699,13 @@ namespace Insurance_Service_Database
 
 
         // -----------------------------------------------------------------------------------------------------------------------   
-        public InsuranceServiceDatabaseEntities Database
+        public InsuranceServiceDatabaseEntities DatabaseContext
         {
             get
             {
                 if (database == null)
                     database = new InsuranceServiceDatabaseEntities();
+                database.Configuration.ProxyCreationEnabled = false;
                 return database;
             }
         }

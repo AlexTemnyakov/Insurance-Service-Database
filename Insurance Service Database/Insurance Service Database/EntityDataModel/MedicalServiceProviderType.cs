@@ -11,7 +11,8 @@ namespace Insurance_Service_Database.EntityDataModel
 {
     using System;
     using System.Collections.Generic;
-    
+    using System.Xml.Serialization;
+
     public partial class MedicalServiceProviderType
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
@@ -27,6 +28,7 @@ namespace Insurance_Service_Database.EntityDataModel
         public Nullable<System.DateTime> ValidUntil { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        [XmlIgnore]
         public virtual ICollection<MedicalServiceProvider> MedicalServiceProviders { get; set; }
     }
 }

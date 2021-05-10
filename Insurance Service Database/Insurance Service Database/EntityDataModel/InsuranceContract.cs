@@ -11,7 +11,8 @@ namespace Insurance_Service_Database.EntityDataModel
 {
     using System;
     using System.Collections.Generic;
-    
+    using System.Xml.Serialization;
+
     public partial class InsuranceContract
     {
         public int Id { get; set; }
@@ -20,9 +21,12 @@ namespace Insurance_Service_Database.EntityDataModel
         public int TypeId { get; set; }
         public System.DateTime ValidFrom { get; set; }
         public Nullable<System.DateTime> ValidUntil { get; set; }
-    
+
+        [XmlIgnore]
         public virtual InsuranceCompany InsuranceCompany { get; set; }
+        [XmlIgnore]
         public virtual MedicalServiceProvider MedicalServiceProvider { get; set; }
+        [XmlIgnore]
         public virtual InsuranceContractType InsuranceContractType { get; set; }
     }
 }
