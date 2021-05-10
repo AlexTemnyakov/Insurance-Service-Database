@@ -11,8 +11,9 @@ namespace Insurance_Service_Database.EntityDataModel
 {
     using System;
     using System.Collections.Generic;
-    
-    public partial class MedicalServiceProvider
+    using System.Xml.Serialization;
+
+    public class MedicalServiceProvider
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public MedicalServiceProvider()
@@ -25,7 +26,9 @@ namespace Insurance_Service_Database.EntityDataModel
         public int Type { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        [XmlIgnore]
         public virtual ICollection<InsuranceContract> InsuranceContracts { get; set; }
+        [XmlIgnore]
         public virtual MedicalServiceProviderType MedicalServiceProviderType { get; set; }
     }
 }

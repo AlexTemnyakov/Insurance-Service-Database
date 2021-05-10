@@ -1,10 +1,14 @@
 ﻿using Insurance_Service_Database.EntityDataModel;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using System.Transactions;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace Insurance_Service_Database
 {
@@ -20,11 +24,35 @@ namespace Insurance_Service_Database
             //insuranceServiceProgram.RemoveAllInsuranceCompanies();
             //insuranceServiceProgram.RemoveAllMedicalServiceProviderTypes();
 
-            //insuranceServiceProgram.AddInsuranceCompanies();
-            //insuranceServiceProgram.AddMedicalServiceProviderTypes();
-            //insuranceServiceProgram.AddInsuranceContractTypes();
-            //insuranceServiceProgram.AddMedicalServiceProviders();
-            //insuranceServiceProgram.AddInsuranceContracts();
+            insuranceServiceProgram.AddInsuranceCompanies();
+            insuranceServiceProgram.AddMedicalServiceProviderTypes();
+            insuranceServiceProgram.AddInsuranceContractTypes();
+            insuranceServiceProgram.AddMedicalServiceProviders();
+            insuranceServiceProgram.AddInsuranceContracts();
+
+            //XmlSerializer xsSubmit = new XmlSerializer(typeof(MedicalServiceProvider));
+            //var subReq = insuranceServiceProgram.FindMedicalServiceProviderById(1);
+            //var xml = "";
+
+            //using (var sww = new StringWriter())
+            //{
+            //    using (XmlWriter writer = XmlWriter.Create(sww))
+            //    {
+            //        xsSubmit.Serialize(writer, subReq);
+            //        xml = sww.ToString(); // Your XML
+            //    }
+            //}
+
+            //using (StreamWriter streamWriter = new StreamWriter("test.xml"))
+            //{
+            //    streamWriter.WriteLine(xml);
+            //}
+
+            //using (XmlWriter writer = XmlWriter.Create("test.xml"))
+            //{
+            //    DataContractSerializer serializer = new DataContractSerializer(subReq.GetType());
+            //    serializer.WriteObject(writer, subReq);
+            //}
 
             Console.ReadKey();
         }
