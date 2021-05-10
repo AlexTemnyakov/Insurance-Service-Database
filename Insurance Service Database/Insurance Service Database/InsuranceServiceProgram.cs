@@ -23,10 +23,16 @@ namespace Insurance_Service_Database
             //insuranceServiceProgram.AddInsuranceCompanies();
             //insuranceServiceProgram.AddMedicalServiceProviderTypes();
             //insuranceServiceProgram.AddInsuranceContractTypes();
+            //insuranceServiceProgram.AddMedicalServiceProviders();
+            //insuranceServiceProgram.AddInsuranceContracts();
 
             Console.ReadKey();
         }
 
+
+
+
+        // -----------------------------------------------------------------------------------------------------------------------
         private void RemoveAllInsuranceCompanies()
         {
             foreach (var entity in Database.InsuranceCompanies)
@@ -40,31 +46,55 @@ namespace Insurance_Service_Database
                 Database.MedicalServiceProviderTypes.Remove(entity);
             Database.SaveChanges();
         }
+        // -----------------------------------------------------------------------------------------------------------------------
 
-        public void PrintDatabaseContent()
-        {
-            PrintInsuranceCompanies();
-            Console.WriteLine("\n\n");
-            PrintMedicalServiceProviderTypes();
-            Console.WriteLine("\n\n");
-            PrintInsuranceContractTypes();
-            Console.WriteLine("\n\n");
-        }        
 
-        public IEnumerable<InsuranceCompany> FindInsuranceCompaniesById(int id)
+
+
+        // -----------------------------------------------------------------------------------------------------------------------          
+        public InsuranceCompany FindInsuranceCompanyById(int id)
         {
-            return from o in Database.InsuranceCompanies
+            var query = from o in Database.InsuranceCompanies
                         where o.Id == id
                         select o;
+            return query.FirstOrDefault();
         }
 
-        public IEnumerable<MedicalServiceProviderType> FindMedicalServiceProviderTypeById(int id)
+        public MedicalServiceProviderType FindMedicalServiceProviderTypeById(int id)
+        {
+            var query = from o in Database.MedicalServiceProviderTypes
+                        where o.Id == id
+                        select o;
+            return query.FirstOrDefault();
+        }
+
+        public IEnumerable<MedicalServiceProviderType> FindMedicalServiceProviderTypesByCode(string code)
         {
             return from o in Database.MedicalServiceProviderTypes
-                        where o.Id == id
-                        select o;
+                   where o.Code == code
+                   select o;
         }
 
+        public MedicalServiceProvider FindMedicalServiceProviderById(int id)
+        {
+            var query = from o in Database.MedicalServiceProviders
+                        where o.Id == id
+                        select o;
+            return query.FirstOrDefault();
+        }
+
+        public IEnumerable<InsuranceContractType> FindInsuranceContractTypesByCode(string code)
+        {
+            return from o in Database.InsuranceContractTypes
+                   where o.Code == code
+                   select o;
+        }
+        // -----------------------------------------------------------------------------------------------------------------------   
+
+
+
+
+        // -----------------------------------------------------------------------------------------------------------------------   
         public bool AddInsuranceCompany(InsuranceCompany insuranceCompany)
         {
             Database.InsuranceCompanies.Add(insuranceCompany);
@@ -94,6 +124,18 @@ namespace Insurance_Service_Database
             return DoCommonStepsAfterAdditionToDatabase();
         }
 
+        public bool AddMedicalServiceProvider(MedicalServiceProvider medicalServiceProvider)
+        {
+            Database.MedicalServiceProviders.Add(medicalServiceProvider);
+            return DoCommonStepsAfterAdditionToDatabase();
+        }
+
+        public bool AddInsuranceContract(InsuranceContract insuranceContract)
+        {
+            Database.InsuranceContracts.Add(insuranceContract);
+            return DoCommonStepsAfterAdditionToDatabase();
+        }
+
         private bool DoCommonStepsAfterAdditionToDatabase()
         {
             try
@@ -109,6 +151,25 @@ namespace Insurance_Service_Database
                 Console.WriteLine(e.InnerException);
                 return false;
             }
+        }
+        // -----------------------------------------------------------------------------------------------------------------------   
+
+
+
+
+        // -----------------------------------------------------------------------------------------------------------------------   
+        public void PrintDatabaseContent()
+        {
+            PrintInsuranceCompanies();
+            Console.WriteLine("\n\n");
+            PrintMedicalServiceProviderTypes();
+            Console.WriteLine("\n\n");
+            PrintInsuranceContractTypes();
+            Console.WriteLine("\n\n");
+            PrintMedicalServiceProviders();
+            Console.WriteLine("\n\n");
+            PrintInsuranceContracts();
+            Console.WriteLine("\n\n");
         }
 
         public void PrintInsuranceCompanies()
@@ -147,6 +208,35 @@ namespace Insurance_Service_Database
             Console.WriteLine("============================================");
         }
 
+        public void PrintMedicalServiceProviders()
+        {
+            Console.WriteLine("========= MEDICAL SERVICE PROVIDERS =========");
+            Console.WriteLine();
+            foreach (var o in Database.MedicalServiceProviders)
+            {
+                Console.WriteLine(EntityToStringConverter.MedicalServiceProviderToString(o));
+                Console.WriteLine("\n");
+            }
+            Console.WriteLine("=============================================");
+        }
+
+        public void PrintInsuranceContracts()
+        {
+            Console.WriteLine("========= INSURANCE CONTRACTS =========");
+            Console.WriteLine();
+            foreach (var o in Database.InsuranceContracts)
+            {
+                Console.WriteLine(o);
+                Console.WriteLine("\n");
+            }
+            Console.WriteLine("=======================================");
+        }
+        // -----------------------------------------------------------------------------------------------------------------------   
+
+
+
+
+        // -----------------------------------------------------------------------------------------------------------------------   
         private void AddInsuranceCompanies()
         {
             try
@@ -323,6 +413,88 @@ namespace Insurance_Service_Database
             }
         }
 
+        private void AddMedicalServiceProviders()
+        {
+
+            //Id Nazev   TypPZS
+            //1   MUDr.Lucie Nováková    P2
+            //2   Fakultní nemocnice Praha P3
+            //3   MDDr.Pavel Zoubek  P1
+
+            try
+            {
+                AddMedicalServiceProvider(new MedicalServiceProvider()
+                {
+                    Name = "MUDr.Lucie Nováková",
+                    Type = (new List<MedicalServiceProviderType>(FindMedicalServiceProviderTypesByCode("P2")))[0].Id
+                });
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+            try
+            {
+                AddMedicalServiceProvider(new MedicalServiceProvider()
+                {
+                    Name = "Fakultní nemocnice Praha",
+                    Type = (new List<MedicalServiceProviderType>(FindMedicalServiceProviderTypesByCode("P3")))[0].Id
+                });
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+            try
+            {
+                AddMedicalServiceProvider(new MedicalServiceProvider()
+                {
+                    Name = "MDDr.Pavel Zoubek",
+                    Type = (new List<MedicalServiceProviderType>(FindMedicalServiceProviderTypesByCode("P1")))[0].Id
+                });
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+        }
+
+        private void AddInsuranceContracts()
+        {
+
+            //Id PoskytovatelZdravotnichSluzebId PojistovnaId TypSmlouvy  DatumOd DatumDo
+            //1   1   1   A001    6 / 5 / 2010    11 / 10 / 2010
+            //2   1   1   A001    6 / 5 / 2013    11 / 10 / 2013
+            //3   1   1   A001    6 / 5 / 2016
+            //4   2   1   A002    6 / 5 / 2016
+            //5   3   1   A001    6 / 5 / 2010    6 / 4 / 2016
+            //6   3   1   A001    6 / 5 / 2016
+
+
+            try
+            {
+                AddInsuranceContract(new InsuranceContract()
+                {
+                    MedicalServiceProvider = FindMedicalServiceProviderById(1).Id,
+                    InsuranceCompany = FindInsuranceCompanyById(1).Id,
+                    Type = (new List<InsuranceContractType>(FindInsuranceContractTypesByCode("A001")))[0].Id,
+                    ValidFrom = new DateTime(2010, 5, 6),
+                    ValidUntil = new DateTime(2010, 10, 11)
+                });
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+        }
+        // -----------------------------------------------------------------------------------------------------------------------   
+
+
+
+
+        // -----------------------------------------------------------------------------------------------------------------------   
         public InsuranceServiceDatabaseEntities Database
         {
             get
