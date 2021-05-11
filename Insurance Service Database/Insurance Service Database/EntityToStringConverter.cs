@@ -33,7 +33,7 @@ namespace Insurance_Service_Database
         public static string InsuranceContractTypeToString(InsuranceContractType insuranceContractType)
         {
             StringBuilder sb = new StringBuilder();
-            sb.AppendFormat("Name: {0}\nID: {1}\nType: {2}\nValid from: {3}\nValid until: {4}", 
+            sb.AppendFormat("Code: {0}\nName: {1}\nID: {2}\nValid from: {3}\nValid until: {4}", 
                 insuranceContractType.Code, 
                 insuranceContractType.Name, 
                 insuranceContractType.Id,
