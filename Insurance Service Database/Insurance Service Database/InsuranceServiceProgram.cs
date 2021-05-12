@@ -1,6 +1,7 @@
 ﻿using Insurance_Service_Database.EntityDataModel;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -23,18 +24,36 @@ namespace Insurance_Service_Database
         private static readonly string commandToSave = "s";
         private static readonly string commandToFind = "f";
         private static readonly string commandToFindById = "i";
+        private static readonly string commandToFindByDate = "d";
+        private static readonly string commandToLoad = "l";
+
         private static readonly string insuranceCompanyCode = "1";
-        private static readonly string medicalServiceProviderCode = "2";
-        private static readonly string insuranceContractTypeCode = "3";
+        private static readonly string medicalServiceProviderTypeCode = "2";
+        private static readonly string medicalServiceProviderCode = "3";
+        private static readonly string insuranceContractTypeCode = "4";
+        private static readonly string insuranceContractsCode = "5";
+
         private static readonly string commandToPrintAllInsuranceCompanies = commandToPrint + insuranceCompanyCode;
+        private static readonly string commandToPrintAllMedicalServiceProviderTypes = commandToPrint + medicalServiceProviderTypeCode;
         private static readonly string commandToPrintAllMedicalServiceProviders = commandToPrint + medicalServiceProviderCode;
         private static readonly string commandToPrintAllInsuranceContractTypes = commandToPrint + insuranceContractTypeCode;
+        private static readonly string commandToPrintAllInsuranceContracts = commandToPrint + insuranceContractsCode;
+
         private static readonly string commandToSaveAllInsuranceCompanies = commandToSave + insuranceCompanyCode;
+        private static readonly string commandToSaveAllMedicalServiceProviderTypes = commandToSave + medicalServiceProviderTypeCode;
         private static readonly string commandToSaveAllMedicalServiceProviders = commandToSave + medicalServiceProviderCode;
         private static readonly string commandToSaveAllInsuranceContractTypes = commandToSave + insuranceContractTypeCode;
+        private static readonly string commandToSaveAllInsuranceContracts = commandToSave + insuranceContractsCode;
+
         private static readonly string commandToFindInsuranceCompanyById = commandToFind + insuranceCompanyCode + commandToFindById;
+        private static readonly string commandToFindMedicalServiceProviderTypeById = commandToFind + medicalServiceProviderTypeCode + commandToFindById;
         private static readonly string commandToFindMedicalServiceProviderById = commandToFind + medicalServiceProviderCode + commandToFindById;
         private static readonly string commandToFindInsuranceContractTypeById = commandToFind + insuranceContractTypeCode + commandToFindById;
+        private static readonly string commandToFindInsuranceContractsById = commandToFind + insuranceContractsCode + commandToFindById;
+        private static readonly string commandToFindInsuranceContractsByDate = commandToFind + insuranceContractsCode + commandToFindByDate;
+
+        private static readonly string commandToLoadNewInsuranceContracts = commandToLoad + insuranceContractsCode;
+
         private static readonly string notFoundText = "Not found.";
         private static readonly string queryResultText = "Your query result:";
         private static readonly string savedInText = "Saved in";
@@ -66,7 +85,7 @@ namespace Insurance_Service_Database
                 {
                     if (input.StartsWith(commandToFindInsuranceCompanyById))
                     {
-                        int id = int.Parse(input.Remove(0, commandToFindInsuranceCompanyById.Length + 1));
+                        int id = RetrieveIdFromInput(input, commandToFindInsuranceCompanyById);
 
                         var result = FindInsuranceCompanyById(id);
 
@@ -76,13 +95,28 @@ namespace Insurance_Service_Database
                         else
                         {
                             Console.WriteLine(queryResultText);
-                            Console.WriteLine(EntityToStringConverter.InsuranceCompanyToString(FindInsuranceCompanyById(id)));
+                            Console.WriteLine(EntityToStringConverter.EntityToString(result));
                         }
                         Console.WriteLine();
                     }
+                    if (input.StartsWith(commandToFindMedicalServiceProviderTypeById))
+                    {
+                        int id = RetrieveIdFromInput(input, commandToFindMedicalServiceProviderTypeById);
+
+                        var result = FindMedicalServiceProviderTypeById(id);
+
+                        Console.WriteLine();
+                        if (result == null)
+                            Console.WriteLine(notFoundText);
+                        else
+                        {
+                            Console.WriteLine(queryResultText);
+                            Console.WriteLine(EntityToStringConverter.EntityToString(result));
+                        }
+                    }
                     if (input.StartsWith(commandToFindMedicalServiceProviderById))
                     {
-                        int id = int.Parse(input.Remove(0, commandToFindMedicalServiceProviderById.Length + 1));
+                        int id = RetrieveIdFromInput(input, commandToFindMedicalServiceProviderById);
 
                         var result = FindMedicalServiceProviderById(id);
 
@@ -92,12 +126,12 @@ namespace Insurance_Service_Database
                         else
                         {
                             Console.WriteLine(queryResultText);
-                            Console.WriteLine(EntityToStringConverter.MedicalServiceProviderToString(result));
+                            Console.WriteLine(EntityToStringConverter.EntityToString(result));
                         }
                     }
                     if (input.StartsWith(commandToFindInsuranceContractTypeById))
                     {
-                        int id = int.Parse(input.Remove(0, commandToFindInsuranceContractTypeById.Length + 1));
+                        int id = RetrieveIdFromInput(input, commandToFindInsuranceContractTypeById);
 
                         var result = FindInsuranceContractTypeById(id);
 
@@ -107,29 +141,84 @@ namespace Insurance_Service_Database
                         else
                         {
                             Console.WriteLine(queryResultText);
-                            Console.WriteLine(EntityToStringConverter.InsuranceContractTypeToString(result));
+                            Console.WriteLine(EntityToStringConverter.EntityToString(result));
+                        }
+                    }
+                    if (input.StartsWith(commandToFindInsuranceContractsById))
+                    {
+                        int id = RetrieveIdFromInput(input, commandToFindInsuranceContractsById);
+
+                        var result = FindInsuranceContractById(id);
+
+                        Console.WriteLine();
+                        if (result == null)
+                            Console.WriteLine(notFoundText);
+                        else
+                        {
+                            Console.WriteLine(queryResultText);
+                            Console.WriteLine(EntityToStringConverter.EntityToString(result));
+                        }
+                    }
+                    if (input.StartsWith(commandToFindInsuranceContractsByDate))
+                    {
+                        string dateString = input.Replace(commandToFindInsuranceContractsByDate + " ", "");
+
+                        DateTime date = DateTime.ParseExact(dateString, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+
+                        var result = FindInsuranceContracts(date);
+
+                        Console.WriteLine();
+                        if (result == null)
+                            Console.WriteLine(notFoundText);
+                        else
+                        {
+                            Console.WriteLine(queryResultText);
+                            foreach (var o in result)
+                            {
+                                Console.WriteLine(EntityToStringConverter.EntityToString(o));
+                            }
                         }
                     }
                     else if (input.StartsWith(commandToSaveAllInsuranceCompanies))
                     {
-                        string path = input.Remove(0, commandToSaveAllInsuranceCompanies.Length + 1);
-                        path = InputToPath(path);
+                        string path = RetrieveStringFromInput(input, commandToSaveAllInsuranceCompanies);
 
                         SaveInsuranceCompaniesToXml(path);
                     }
+                    else if (input.StartsWith(commandToSaveAllMedicalServiceProviderTypes))
+                    {
+                        string path = RetrieveStringFromInput(input, commandToSaveAllMedicalServiceProviderTypes);
+
+                        SaveMedicalServiceProviderTypesToXml(path);
+                    }
                     else if (input.StartsWith(commandToSaveAllMedicalServiceProviders))
                     {
-                        string path = input.Remove(0, commandToSaveAllMedicalServiceProviders.Length + 1);
-                        path = InputToPath(path);
+                        string path = RetrieveStringFromInput(input, commandToSaveAllMedicalServiceProviders);
 
                         SaveMedicalServiceProvidersToXml(path);
                     }
                     else if (input.StartsWith(commandToSaveAllInsuranceContractTypes))
                     {
-                        string path = input.Remove(0, commandToSaveAllInsuranceContractTypes.Length + 1);
-                        path = InputToPath(path);
+                        string path = RetrieveStringFromInput(input, commandToSaveAllInsuranceContractTypes);
 
                         SaveInsuranceContractTypesToXml(path);
+                    }
+                    else if (input.StartsWith(commandToSaveAllInsuranceContracts))
+                    {
+                        string path = RetrieveStringFromInput(input, commandToSaveAllInsuranceContracts);
+
+                        SaveInsuranceContractsToXml(path);
+                    }
+                    else if (input.StartsWith(commandToLoadNewInsuranceContracts))
+                    {
+                        string path = RetrieveStringFromInput(input, commandToLoadNewInsuranceContracts);
+
+                        var loadedEntities = ReadEntities<InsuranceContract>(path);
+
+                        foreach (var o in loadedEntities)
+                        {
+                            Console.WriteLine(EntityToStringConverter.EntityToString(o));
+                        }
                     }
                     else if (input == commandToExit)
                     {
@@ -147,6 +236,10 @@ namespace Insurance_Service_Database
                     {
                         PrintInsuranceCompanies();
                     }
+                    else if (input == commandToPrintAllMedicalServiceProviderTypes)
+                    {
+                        PrintMedicalServiceProviderTypes();
+                    }
                     else if (input == commandToPrintAllMedicalServiceProviders)
                     {
                         PrintMedicalServiceProviders();
@@ -154,6 +247,10 @@ namespace Insurance_Service_Database
                     else if (input == commandToPrintAllInsuranceContractTypes)
                     {
                         PrintInsuranceContractTypes();
+                    }
+                    else if (input == commandToPrintAllInsuranceContracts)
+                    {
+                        PrintInsuranceContracts();
                     }
                     else if (input == commandToResetDatabase)
                     {
@@ -190,13 +287,18 @@ namespace Insurance_Service_Database
             Console.ReadKey();
         }
 
-        private static string InputToPath(string s)
+        private static string RetrieveStringFromInput(string input, string command)
         {
-            s = s.Remove(0, 1);
-            s = s.Remove(s.Length - 1, 1);
-            return s;
+            input = input.Remove(0, command.Length + 1);
+            input = input.Remove(0, 1);
+            input = input.Remove(input.Length - 1, 1);
+            return input;
         }
 
+        private static int RetrieveIdFromInput(string input, string command)
+        {
+            return int.Parse(input.Remove(0, command.Length + 1));
+        }     
 
         // -----------------------------------------------------------------------------------------------------------------------1
         private EntityCollectionWrapper<T> DeserializeObject<T>(string path)
@@ -378,17 +480,28 @@ namespace Insurance_Service_Database
                    select o;
         }
 
+        public InsuranceContract FindInsuranceContractById(int id)
+        {
+            var query = from o in DatabaseContext.InsuranceContracts
+                        where o.Id == id
+                        select o;
+            return query.FirstOrDefault();
+        }
+
         public IEnumerable<InsuranceContract> FindInsuranceContracts(int medicalServiceProvider, int insuranceCompany, int type)
         {
-            //return from o in DatabaseContext.InsuranceContracts
-            //       where o.MedicalServiceProviderId = medicalServiceProvider
-            //       where o.insuranceCompany ==
-            //       select o;
             return DatabaseContext.InsuranceContracts
                 .Where(o => o.MedicalServiceProviderId == medicalServiceProvider)
                 .Where(o => o.InsuranceCompanyId == insuranceCompany)
                 .Where(o => o.TypeId == type)
                 .Select(o => o);
+        }
+
+        public IEnumerable<InsuranceContract> FindInsuranceContracts(DateTime date)
+        {
+            return from o in DatabaseContext.InsuranceContracts
+                   where o.ValidUntil == null || DateTime.Compare(o.ValidUntil.Value, date) >= 0
+                   select o;
         }
         // -----------------------------------------------------------------------------------------------------------------------   
 
@@ -480,7 +593,10 @@ namespace Insurance_Service_Database
                 commandToPrint, Environment.NewLine);
             sb.AppendFormat(
                 @"{0}        - print insurance companies{1}",
-                commandToPrintAllInsuranceCompanies, Environment.NewLine);            
+                commandToPrintAllInsuranceCompanies, Environment.NewLine);
+            sb.AppendFormat(
+               @"{0}        - print medical service provider types{1}",
+               commandToPrintAllMedicalServiceProviderTypes, Environment.NewLine);
             sb.AppendFormat(
                @"{0}        - print medical service providers{1}",
                commandToPrintAllMedicalServiceProviders, Environment.NewLine);
@@ -488,23 +604,44 @@ namespace Insurance_Service_Database
                 @"{0}        - print insurance contract types{1}",
                 commandToPrintAllInsuranceContractTypes, Environment.NewLine);
             sb.AppendFormat(
-                "{0} \"PATH\" - save insurance companies{1}",
+                @"{0}                 - print insurance contracts{1}",
+                commandToPrintAllInsuranceContracts, Environment.NewLine);
+            sb.AppendFormat(
+                "{0} \"PATH\"          - save insurance companies{1}",
                 commandToSaveAllInsuranceCompanies, Environment.NewLine);
             sb.AppendFormat(
-                "{0} \"PATH\" - save medical service providers{1}",
+                "{0} \"PATH\"          - save medical service provider types{1}",
+                commandToSaveAllMedicalServiceProviderTypes, Environment.NewLine);
+            sb.AppendFormat(
+                "{0} \"PATH\"          - save medical service providers{1}",
                 commandToSaveAllMedicalServiceProviders, Environment.NewLine);
             sb.AppendFormat(
-                "{0} \"PATH\" - save insurance contract types{1}",
+                "{0} \"PATH\"          - save insurance contract types{1}",
                 commandToSaveAllInsuranceContractTypes, Environment.NewLine);
             sb.AppendFormat(
-                @"{0} ID    - find insurance company by ID{1}",
+                "{0} \"PATH\"          - save insurance contracts{1}",
+                commandToSaveAllInsuranceContracts, Environment.NewLine);
+            sb.AppendFormat(
+                @"{0} ID             - find insurance company by ID{1}",
                 commandToFindInsuranceCompanyById, Environment.NewLine);
             sb.AppendFormat(
-                @"{0} ID    - find medical service provider by ID{1}",
+                @"{0} ID             - find medical service provider type by ID{1}",
+                commandToFindMedicalServiceProviderTypeById, Environment.NewLine);
+            sb.AppendFormat(
+                @"{0} ID             - find medical service provider by ID{1}",
                 commandToFindMedicalServiceProviderById, Environment.NewLine);
             sb.AppendFormat(
-                @"{0} ID    - find insurance contract type by ID{1}",
+                @"{0} ID             - find insurance contract type by ID{1}",
                 commandToFindInsuranceContractTypeById, Environment.NewLine);
+            sb.AppendFormat(
+                @"{0} ID             - find insurance contracts by ID{1}",
+                commandToFindInsuranceContractsById, Environment.NewLine);
+            sb.AppendFormat(
+                @"{0} dd/MM/yyyy     - find insurance contracts by date{1}",
+                commandToFindInsuranceContractsByDate, Environment.NewLine);
+            sb.AppendFormat(
+                "{0} \"PATH\"          - load insurance contracts{1}",
+                commandToLoadNewInsuranceContracts, Environment.NewLine);
 
             Console.WriteLine(sb.ToString());
         }
@@ -529,7 +666,7 @@ namespace Insurance_Service_Database
             Console.WriteLine();
             foreach (var o in DatabaseContext.InsuranceCompanies)
             {
-                Console.WriteLine(EntityToStringConverter.InsuranceCompanyToString(o));
+                Console.WriteLine(EntityToStringConverter.EntityToString(o));
                 Console.WriteLine("\n");
             }
             Console.WriteLine("=======================================");
@@ -541,7 +678,7 @@ namespace Insurance_Service_Database
             Console.WriteLine();
             foreach (var o in DatabaseContext.MedicalServiceProviderTypes)
             {
-                Console.WriteLine(EntityToStringConverter.MedicalServiceProviderTypeToString(o));
+                Console.WriteLine(EntityToStringConverter.EntityToString(o));
                 Console.WriteLine("\n");
             }
             Console.WriteLine("=============================================");
@@ -553,7 +690,7 @@ namespace Insurance_Service_Database
             Console.WriteLine();
             foreach (var o in DatabaseContext.InsuranceContractTypes)
             {
-                Console.WriteLine(EntityToStringConverter.InsuranceContractTypeToString(o));
+                Console.WriteLine(EntityToStringConverter.EntityToString(o));
                 Console.WriteLine("\n");
             }
             Console.WriteLine("============================================");
@@ -565,7 +702,7 @@ namespace Insurance_Service_Database
             Console.WriteLine();
             foreach (var o in DatabaseContext.MedicalServiceProviders)
             {
-                Console.WriteLine(EntityToStringConverter.MedicalServiceProviderToString(o));
+                Console.WriteLine(EntityToStringConverter.EntityToString(o));
                 Console.WriteLine("\n");
             }
             Console.WriteLine("=============================================");
@@ -577,7 +714,7 @@ namespace Insurance_Service_Database
             Console.WriteLine();
             foreach (var o in DatabaseContext.InsuranceContracts)
             {
-                Console.WriteLine(o);
+                Console.WriteLine(EntityToStringConverter.EntityToString(o));
                 Console.WriteLine("\n");
             }
             Console.WriteLine("=======================================");
