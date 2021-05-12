@@ -1,0 +1,11 @@
+<EntityCollectionWrapperOfInsuranceContract xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <EntityList>
+    <InsuranceContract>
+      <MedicalServiceProviderId>3</MedicalServiceProviderId>
+      <InsuranceCompanyId>1</InsuranceCompanyId>
+      <TypeId>1</TypeId>
+      <ValidFrom>2019-05-06T00:00:00</ValidFrom>
+      <ValidUntil xsi:nil="true" />
+    </InsuranceContract>
+  </EntityList>
+</EntityCollectionWrapperOfInsuranceContract>
