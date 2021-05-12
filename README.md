@@ -2,12 +2,12 @@
 
 The usage:
 
-All xml files must be in folder "Data" with the executable.
-
-
-e                  - exit
-h                  - print help
-r                  - reset database content
+All xml files must be in folder "Data" with the executable.\
+\
+\
+e                  - exit\
+h                  - print help\
+r                  - reset database content\
 d                  - fill database with default data
 p                  - print database content
 p1                 - print insurance companies
