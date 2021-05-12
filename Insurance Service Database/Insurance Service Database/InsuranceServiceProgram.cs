@@ -52,15 +52,38 @@ namespace Insurance_Service_Database
         private static readonly string commandToFindInsuranceContractsById = commandToFind + insuranceContractsCode + commandToFindById;
         private static readonly string commandToFindInsuranceContractsByDate = commandToFind + insuranceContractsCode + commandToFindByDate;
 
+        private static readonly string commandToLoadNewInsuranceCompanies = commandToLoad + insuranceCompanyCode;
+        private static readonly string commandToLoadNewMedicalServiceProviders = commandToLoad + medicalServiceProviderCode;
         private static readonly string commandToLoadNewInsuranceContracts = commandToLoad + insuranceContractsCode;
 
         private static readonly string notFoundText = "Not found.";
         private static readonly string queryResultText = "Your query result:";
+        private static readonly string loadedEntitiesText = "Loaded entities:";
+        private static readonly string noEntitiesLoaded = "No entities loaded.";
+        private static readonly string validText = "Valid";
+        private static readonly string invalidText = "Invalid";
         private static readonly string savedInText = "Saved in";
+        private static readonly string readingFromText = "Reading from ";
         private static readonly string exitText = "Exiting.";
         private static readonly string greetingsText = "Hello!";
         private static readonly string goodbyeText = "Goodbye!";
         private static readonly string pressAnyButtonToClose = "Press any button to close.";
+        private static readonly string spaceDelimiter = "\n\n\n";
+        private static readonly string majorDelimiter
+            = "\n\n\n"
+            + "=========================================================================================="
+            + "\n\n\n";
+        private static readonly string minorDelimiter
+            = "\n"
+            + "--------------------------------------"
+            + "\n";
+
+        private static readonly string dataFolder = "Data";
+
+        private static readonly ConsoleColor normalBackgroundColor1 = ConsoleColor.Yellow;
+        private static readonly ConsoleColor normalForegroundColor1 = ConsoleColor.Black;
+        private static readonly ConsoleColor exceptionBackgroundColor1 = ConsoleColor.Red;
+        private static readonly ConsoleColor exceptionForegroundColor1 = ConsoleColor.White;
 
         private InsuranceServiceDatabaseEntities databaseContext;
 
@@ -209,16 +232,109 @@ namespace Insurance_Service_Database
 
                         SaveInsuranceContractsToXml(path);
                     }
+                    else if (input.StartsWith(commandToLoadNewInsuranceCompanies))
+                    {
+                        string path = RetrieveStringFromInput(input, commandToLoadNewInsuranceCompanies);
+
+                        var loadedEntities = ReadEntities<InsuranceCompany>(path);
+
+                        Console.WriteLine(majorDelimiter);
+                        if (loadedEntities != null && loadedEntities.Count > 0)
+                        {
+                            Console.WriteLine(loadedEntitiesText);
+                            Console.WriteLine(minorDelimiter);
+
+                            for (int i = 0; i < loadedEntities.Count; i++)
+                            {
+                                var company = loadedEntities[i];
+
+                                Console.WriteLine(i);
+                                Console.WriteLine(EntityToStringConverter.EntityToString(company));
+                                Console.WriteLine();
+
+                                AddInsuranceCompany(company);
+                                Console.WriteLine(minorDelimiter);
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine(noEntitiesLoaded);
+                        }
+
+                        Console.WriteLine(majorDelimiter);
+                    }
                     else if (input.StartsWith(commandToLoadNewInsuranceContracts))
                     {
                         string path = RetrieveStringFromInput(input, commandToLoadNewInsuranceContracts);
 
                         var loadedEntities = ReadEntities<InsuranceContract>(path);
 
-                        foreach (var o in loadedEntities)
+                        Console.WriteLine(majorDelimiter);
+                        if (loadedEntities != null && loadedEntities.Count > 0)
                         {
-                            Console.WriteLine(EntityToStringConverter.EntityToString(o));
+                            Console.WriteLine(loadedEntitiesText);
+                            Console.WriteLine(minorDelimiter);
+
+                            for (int i = 0; i < loadedEntities.Count; i++)
+                            {
+                                var contract = loadedEntities[i];
+
+                                Console.WriteLine(i);
+                                Console.WriteLine(EntityToStringConverter.EntityToString(contract));
+                                Console.WriteLine();
+
+                                string log;
+                                if (ValidateNewInsuranceContract(contract, out log))
+                                {
+                                    Console.WriteLine(validText);
+                                    CloseContractAndAddNew(contract);
+                                }
+                                else
+                                {
+                                    Console.WriteLine(invalidText);
+                                    Console.WriteLine(log);
+                                }
+                                Console.WriteLine(minorDelimiter);
+                            }
                         }
+                        else
+                        {
+                            Console.WriteLine(noEntitiesLoaded);
+                        }
+
+                        Console.WriteLine(majorDelimiter);
+                    }
+                    else if (input.StartsWith(commandToLoadNewMedicalServiceProviders))
+                    {
+                        string path = RetrieveStringFromInput(input, commandToLoadNewMedicalServiceProviders);
+
+                        var loadedEntities = ReadEntities<MedicalServiceProvider>(path);
+
+                        Console.WriteLine(majorDelimiter);
+                        if (loadedEntities != null && loadedEntities.Count > 0)
+                        {
+                            Console.WriteLine(loadedEntitiesText);
+                            Console.WriteLine(minorDelimiter);
+
+                            for (int i = 0; i < loadedEntities.Count; i++)
+                            {
+                                var contract = loadedEntities[i];
+
+                                Console.WriteLine(i);
+                                Console.WriteLine(EntityToStringConverter.EntityToString(contract));
+                                Console.WriteLine();
+
+                                AddMedicalServiceProvider(contract);
+
+                                Console.WriteLine(minorDelimiter);
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine(noEntitiesLoaded);
+                        }
+
+                        Console.WriteLine(majorDelimiter);
                     }
                     else if (input == commandToExit)
                     {
@@ -276,13 +392,23 @@ namespace Insurance_Service_Database
                 }
                 catch (Exception e)
                 {
+                    Console.BackgroundColor = exceptionBackgroundColor1;
+                    Console.ForegroundColor = exceptionForegroundColor1;
+
+                    Console.WriteLine(majorDelimiter);
                     Console.WriteLine(e.Message);
+                    Console.WriteLine(majorDelimiter);
+
+                    Console.ResetColor();
                 }
             }
 
-            Console.WriteLine();
+            Console.BackgroundColor = normalBackgroundColor1;
+            Console.ForegroundColor = normalForegroundColor1;
+            Console.WriteLine(majorDelimiter);
             Console.WriteLine(exitText);
             Console.WriteLine(goodbyeText);
+            Console.ResetColor();
             Console.WriteLine(pressAnyButtonToClose);
             Console.ReadKey();
         }
@@ -303,6 +429,13 @@ namespace Insurance_Service_Database
         // -----------------------------------------------------------------------------------------------------------------------1
         private EntityCollectionWrapper<T> DeserializeObject<T>(string path)
         {
+            Console.BackgroundColor = normalBackgroundColor1;
+            Console.ForegroundColor = normalForegroundColor1;
+            Console.WriteLine(readingFromText + path);
+            Console.ResetColor();
+
+            path = dataFolder + "\\" + path;
+
             XmlSerializer serializer =
             new XmlSerializer(typeof(EntityCollectionWrapper<T>));
 
@@ -370,6 +503,11 @@ namespace Insurance_Service_Database
 
         public static void SaveString(string stringToSave, string path)
         {
+            if (!Directory.Exists(dataFolder))
+                Directory.CreateDirectory(dataFolder);
+
+            path = dataFolder + "\\" + path;
+
             using (StreamWriter streamWriter = new StreamWriter(path))
             {
                 streamWriter.WriteLine(stringToSave);
@@ -493,8 +631,7 @@ namespace Insurance_Service_Database
             return DatabaseContext.InsuranceContracts
                 .Where(o => o.MedicalServiceProviderId == medicalServiceProvider)
                 .Where(o => o.InsuranceCompanyId == insuranceCompany)
-                .Where(o => o.TypeId == type)
-                .Select(o => o);
+                .Where(o => o.TypeId == type);
         }
 
         public IEnumerable<InsuranceContract> FindInsuranceContracts(DateTime date)
@@ -546,7 +683,6 @@ namespace Insurance_Service_Database
 
         public bool AddInsuranceContract(InsuranceContract insuranceContract)
         {
-            //foreach (var o in FindInsuranceContracts())
             DatabaseContext.InsuranceContracts.Add(insuranceContract);
             return DoCommonStepsAfterAdditionToDatabase();
         }
@@ -567,6 +703,76 @@ namespace Insurance_Service_Database
                 return false;
             }
         }
+
+        private void CloseContractAndAddNew(InsuranceContract newContract)
+        {
+            var similarContracts = FindInsuranceContracts(newContract.MedicalServiceProviderId, newContract.InsuranceCompanyId, newContract.TypeId);
+
+            foreach (var contract in similarContracts)
+            {
+                if (contract.ValidUntil == null)
+                {
+                    contract.ValidUntil = newContract.ValidFrom.AddDays(-1);
+                    break;
+                }
+            }
+
+            AddInsuranceContract(newContract);
+        }
+
+        private bool ValidateNewInsuranceContract(InsuranceContract newContract, out string log)
+        {
+            if (newContract.ValidFrom == null)
+            {
+                log = "The validity start date is not set.";
+                return false;
+            }
+
+            if (newContract.ValidUntil != null && DateTime.Compare(newContract.ValidUntil.Value, newContract.ValidFrom) <= 0)
+            {
+                log = "The new contract is valid from the date which is earlier than the last day of validity.";
+                return false;
+            }
+
+            var similarContracts = FindInsuranceContracts(newContract.MedicalServiceProviderId, newContract.InsuranceCompanyId, newContract.TypeId);
+
+            foreach (var contract in similarContracts)
+            {
+                if (contract.ValidUntil != null && DateTime.Compare(newContract.ValidFrom, contract.ValidUntil.Value) <= 0)
+                {
+                    log = "There is a similar contract which is valid when the new contract starts to be valid.";
+                    return false;
+                }
+
+                if (DateTime.Compare(newContract.ValidFrom, contract.ValidFrom) <= 0)
+                {
+                    log = "There is a similar contract the validity date of which starts later.";
+                    return false;
+                }
+            }
+
+            if (FindMedicalServiceProviderById(newContract.MedicalServiceProviderId) == null)
+            {
+                log = "Couldn't find the medical service provider with id " + newContract.MedicalServiceProviderId + ".";
+                return false;
+            }
+
+            if (FindInsuranceCompanyById(newContract.InsuranceCompanyId) == null)
+            {
+                log = "Couldn't find the medical insurance company with id " + newContract.InsuranceCompanyId + ".";
+                return false;
+            }
+
+            if (FindInsuranceContractTypeById(newContract.TypeId) == null)
+            {
+                log = "Couldn't find the medical insurance contract type with id " + newContract.TypeId + ".";
+                return false;
+            }
+
+            log = "The new contract is valid.";
+
+            return true;
+        }
         // -----------------------------------------------------------------------------------------------------------------------   
 
 
@@ -577,49 +783,49 @@ namespace Insurance_Service_Database
         {
             StringBuilder sb = new StringBuilder();
             sb.AppendFormat(
-                @"{0}         - exit{1}",
+                @"{0}                  - exit{1}",
                 commandToExit, Environment.NewLine);
             sb.AppendFormat(
-                @"{0}         - print help{1}",
+                @"{0}                  - print help{1}",
                 commandToPrintHelp, Environment.NewLine);
             sb.AppendFormat(
-                @"{0}         - reset database content{1}",
+                @"{0}                  - reset database content{1}",
                 commandToResetDatabase, Environment.NewLine);
             sb.AppendFormat(
-                @"{0}         - fill database with default data (database will be reseted){1}",
+                @"{0}                  - fill database with default data (database will be reseted){1}",
                 commandToFillWithDefaultData, Environment.NewLine);
             sb.AppendFormat(
-                @"{0}         - print database content{1}",
+                @"{0}                  - print database content{1}",
                 commandToPrint, Environment.NewLine);
             sb.AppendFormat(
-                @"{0}        - print insurance companies{1}",
+                @"{0}                 - print insurance companies{1}",
                 commandToPrintAllInsuranceCompanies, Environment.NewLine);
             sb.AppendFormat(
-               @"{0}        - print medical service provider types{1}",
+               @"{0}                 - print medical service provider types{1}",
                commandToPrintAllMedicalServiceProviderTypes, Environment.NewLine);
             sb.AppendFormat(
-               @"{0}        - print medical service providers{1}",
+               @"{0}                 - print medical service providers{1}",
                commandToPrintAllMedicalServiceProviders, Environment.NewLine);
             sb.AppendFormat(
-                @"{0}        - print insurance contract types{1}",
+                @"{0}                 - print insurance contract types{1}",
                 commandToPrintAllInsuranceContractTypes, Environment.NewLine);
             sb.AppendFormat(
                 @"{0}                 - print insurance contracts{1}",
                 commandToPrintAllInsuranceContracts, Environment.NewLine);
             sb.AppendFormat(
-                "{0} \"PATH\"          - save insurance companies{1}",
+                "{0} \"NAME\"          - save insurance companies{1}",
                 commandToSaveAllInsuranceCompanies, Environment.NewLine);
             sb.AppendFormat(
-                "{0} \"PATH\"          - save medical service provider types{1}",
+                "{0} \"NAME\"          - save medical service provider types{1}",
                 commandToSaveAllMedicalServiceProviderTypes, Environment.NewLine);
             sb.AppendFormat(
-                "{0} \"PATH\"          - save medical service providers{1}",
+                "{0} \"NAME\"          - save medical service providers{1}",
                 commandToSaveAllMedicalServiceProviders, Environment.NewLine);
             sb.AppendFormat(
-                "{0} \"PATH\"          - save insurance contract types{1}",
+                "{0} \"NAME\"          - save insurance contract types{1}",
                 commandToSaveAllInsuranceContractTypes, Environment.NewLine);
             sb.AppendFormat(
-                "{0} \"PATH\"          - save insurance contracts{1}",
+                "{0} \"NAME\"          - save insurance contracts{1}",
                 commandToSaveAllInsuranceContracts, Environment.NewLine);
             sb.AppendFormat(
                 @"{0} ID             - find insurance company by ID{1}",
@@ -640,10 +846,21 @@ namespace Insurance_Service_Database
                 @"{0} dd/MM/yyyy     - find insurance contracts by date{1}",
                 commandToFindInsuranceContractsByDate, Environment.NewLine);
             sb.AppendFormat(
-                "{0} \"PATH\"          - load insurance contracts{1}",
+                "{0} \"NAME\"          - load insurance companies and add to database{1}",
+                commandToLoadNewInsuranceCompanies, Environment.NewLine);
+            sb.AppendFormat(
+                "{0} \"NAME\"          - load medical service providers and add to database{1}",
+                commandToLoadNewMedicalServiceProviders, Environment.NewLine);
+            sb.AppendFormat(
+                "{0} \"NAME\"          - load insurance contracts and add to database{1}",
                 commandToLoadNewInsuranceContracts, Environment.NewLine);
 
-            Console.WriteLine(sb.ToString());
+            Console.BackgroundColor = normalBackgroundColor1;
+            Console.ForegroundColor = normalForegroundColor1;
+            Console.WriteLine(majorDelimiter);
+            Console.Write(sb.ToString());
+            Console.WriteLine(majorDelimiter);
+            Console.ResetColor();
         }
 
         public void PrintDatabaseContent()
@@ -662,6 +879,7 @@ namespace Insurance_Service_Database
 
         public void PrintInsuranceCompanies()
         {
+            Console.WriteLine(spaceDelimiter);
             Console.WriteLine("========= INSURANCE COMPANIES =========");
             Console.WriteLine();
             foreach (var o in DatabaseContext.InsuranceCompanies)
@@ -670,10 +888,12 @@ namespace Insurance_Service_Database
                 Console.WriteLine("\n");
             }
             Console.WriteLine("=======================================");
+            Console.WriteLine(spaceDelimiter);
         }
 
         public void PrintMedicalServiceProviderTypes()
         {
+            Console.WriteLine(spaceDelimiter);
             Console.WriteLine("========= MEDICAL SERVICE PROVIDER TYPES =========");
             Console.WriteLine();
             foreach (var o in DatabaseContext.MedicalServiceProviderTypes)
@@ -682,10 +902,12 @@ namespace Insurance_Service_Database
                 Console.WriteLine("\n");
             }
             Console.WriteLine("=============================================");
+            Console.WriteLine(spaceDelimiter);
         }
 
         public void PrintInsuranceContractTypes()
         {
+            Console.WriteLine(spaceDelimiter);
             Console.WriteLine("========= INSURANCE CONTRACT TYPES =========");
             Console.WriteLine();
             foreach (var o in DatabaseContext.InsuranceContractTypes)
@@ -694,10 +916,12 @@ namespace Insurance_Service_Database
                 Console.WriteLine("\n");
             }
             Console.WriteLine("============================================");
+            Console.WriteLine(spaceDelimiter);
         }
 
         public void PrintMedicalServiceProviders()
         {
+            Console.WriteLine(spaceDelimiter);
             Console.WriteLine("========= MEDICAL SERVICE PROVIDERS =========");
             Console.WriteLine();
             foreach (var o in DatabaseContext.MedicalServiceProviders)
@@ -706,10 +930,12 @@ namespace Insurance_Service_Database
                 Console.WriteLine("\n");
             }
             Console.WriteLine("=============================================");
+            Console.WriteLine(spaceDelimiter);
         }
 
         public void PrintInsuranceContracts()
         {
+            Console.WriteLine(spaceDelimiter);
             Console.WriteLine("========= INSURANCE CONTRACTS =========");
             Console.WriteLine();
             foreach (var o in DatabaseContext.InsuranceContracts)
@@ -718,6 +944,7 @@ namespace Insurance_Service_Database
                 Console.WriteLine("\n");
             }
             Console.WriteLine("=======================================");
+            Console.WriteLine(spaceDelimiter);
         }
         // -----------------------------------------------------------------------------------------------------------------------   
 

@@ -9,6 +9,8 @@ namespace Insurance_Service_Database
 {
     class EntityToStringConverter
     {
+        public static string dateFormatString = "dd/MM/yyyy";
+
         public static string EntityToString(InsuranceCompany insuranceCompany)
         {
             StringBuilder sb = new StringBuilder();
@@ -37,8 +39,8 @@ namespace Insurance_Service_Database
                 insuranceContractType.Code, 
                 insuranceContractType.Name, 
                 insuranceContractType.Id,
-                insuranceContractType.ValidFrom,
-                insuranceContractType.ValidUntil);
+                insuranceContractType.ValidFrom.ToString(dateFormatString),
+                insuranceContractType.ValidUntil == null ? "" : insuranceContractType.ValidUntil.Value.ToString(dateFormatString));
             return sb.ToString();
         }
 
@@ -50,8 +52,8 @@ namespace Insurance_Service_Database
                 insuranceContract.MedicalServiceProviderId,
                 insuranceContract.InsuranceCompanyId,
                 insuranceContract.TypeId,
-                insuranceContract.ValidFrom,
-                insuranceContract.ValidUntil);
+                insuranceContract.ValidFrom.ToString(dateFormatString),
+                insuranceContract.ValidUntil == null ? "" : insuranceContract.ValidUntil.Value.ToString(dateFormatString));
             return sb.ToString();
         }
     }
